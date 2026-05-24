@@ -37,9 +37,8 @@ metadata:
   name: mongodb-service
 spec:
   selector:
-    matchLabels:
-      app: mongodb
-    ports:
-      - protocol: TCP
-        port: 27017
-        targetPort: 27017
+    app: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
