@@ -22,4 +22,5 @@ kubectl apply -f nginx-1.deploy.yaml
 kubectl delete -f nginx-1.deploy.yaml
 kubectl get pod -o wide
 kubectl get deployment nginx-deployment -o yaml
+echo -n 'username' | base64
 ```
