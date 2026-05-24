@@ -19,4 +19,6 @@ kubectl exec -it mongo-1-75d69d7f45-cv9jz -- bin/bash
 kubectl get deployments
 kubectl apply -f <configuration-file>
 kubectl apply -f nginx-1.deploy.yaml
+kubectl delete -f nginx-1.deploy.yaml
+
 ```
