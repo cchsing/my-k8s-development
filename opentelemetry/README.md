@@ -1,10 +1,69 @@
+# OpenTelemetry Setup in K8s
+https://www.youtube.com/watch?v=PrIYUO51rMU
 
 
+```bash
+helm search repo open-telemetry --versions
+export OTEL_VERSION=0.114.0
+helm repo add jetstack https://charts.jetstack.io
+export CERTMANAGER_VERSION=v1.20.2
+
+helm install \
+cert-manager jetstack/cert-manager \
+--namespace cert-manager \
+--create-namespace \
+--version $CERTMANAGER_VERSION \
+--set crds.enabled=true \
+--set startupapicheck.timeout="5ms"
+
+helm install opentelemetry-operator open-telemetry/opentelemetry-operator \
+--namespace opentelemetry-operator-system \
+--create-namespace \
+--version $OTEL_VERSION \
+--values=opentelemetry/values.yaml
+
+helm show values open-telemetry/opentelemetry-operators > values.yaml
+kubectl create namespace monitoring
+kubectl apply -n monitoring -f opentelemetry/otelcol.yaml
 ```
+
+```bash
 helm install opentelemetry-operator open-telemetry/opentelemetry-operator \
 --set "manager.collectorImage.repository=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s" \
 --set admissionWebhooks.certManager.enabled=false \
---set admissionWebhooks.autoGenerateCert.enabled=true
+--set admissionWebhooks.autoGenerateCert.enabled=true \
+--namespace otel-test-1
 
 helm show values open-telemetry/opentelemetry-operator
+helm get values open-telemetry/opentelemetry-operator
+
+helm install opentelemetry-collector open-telemetry/opentelemetry-collector \
+   --set image.repository="otel/opentelemetry-collector-k8s" \
+   --set mode=daemonset
+helm install otelcol-daemonset open-telemetry/opentelemetry-collector -f ./opentelemetry/otelcol-daemonset.helm.chart.yaml
+helm upgrade otelcol-daemonset open-telemetry/opentelemetry-collector -f ./opentelemetry/otelcol-daemonset.helm.chart.yaml
+helm uninstall opentelemetry-collector
+helm install otelcol-deployment open-telemetry/opentelemetry-collector -f ./opentelemetry/otelcol-deployment.helm.chart.yaml
+
+helm install otel-demo open-telemetry/opentelemetry-demo --namespace otel-test-1
+helm template opentelemetry-demo open-telemetry/opentelemetry-demo --namespace otel-test-1 > opentelemetry-demo.yaml
+kubectl describe serviceaccount otel-collector -n otel-test-1
+kubectl delete serviceaccount otel-collector -n otel-test-1
+kubectl --namespace otel-test-1 port-forward svc/frontend-proxy 8080:8080
+```
+
+```bash
+kubectl apply -f ./opentelemetry/otel-configmap.yaml
+kubectl apply -f ./opentelemetry/otel-secret.yaml
+```
+
+```bash
+helm install opentelemetry-operator open-telemetry/opentelemetry-operator \
+--namespace opentelemetry-operator-system \
+--create-namespace \
+--set "manager.collectorImage.repository=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib"
+
+kubectl exec -it <pod-name> -- bin/bash
+kubectl debug -it <pod-name> -n <namespace> --image=busybox --target=<container-name>
+kubectl rollout restart deployment <deployment_name>
 ```

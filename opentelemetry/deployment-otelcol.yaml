@@ -1,0 +1,44 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: deployment-otelcol
+  namespace: otel-collectors
+spec:
+  image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib"
+  mode: deployment
+  hostNetwork: true
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+      k8s_cluster:
+        collection_interval: 10s
+      
+    exporters:
+      debug:
+        verbosity: detailed
+      splunk_hec/metrics:
+        token: "6e8749fe-1fcc-4bd6-aebd-762871effc72"
+        endpoint: "https://192.168.1.102:8088/services/collector"
+        index: "otlp-metrics"
+        tls:
+          insecure_skip_verify: true
+      splunk_hec/logs:
+        token: "6e8749fe-1fcc-4bd6-aebd-762871effc72"
+        endpoint: "https://192.168.1.102:8088/services/collector"
+        index: "otlp-logs"
+        tls:
+          insecure_skip_verify: true
+
+    service:
+      pipelines:
+        metrics:
+          receivers: [otlp,k8s_cluster]
+          exporters: [splunk_hec/metrics]
+        logs:
+          receivers: [otlp,k8s_cluster]
+          exporters: [splunk_hec/logs]
