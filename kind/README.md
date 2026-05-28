@@ -20,6 +20,7 @@ mv ./kind /usr/local/bin/kind
 Create kind cluster
 ```bash
 kind create cluster -n <cluster_name>
+kind create cluster -n otel-cluster --config ./kind/kind-cluster.yaml
 kind get clusters
 kubectl cluster-info --context kind-<cluster_name>
 ```

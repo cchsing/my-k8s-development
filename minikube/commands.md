@@ -24,4 +24,10 @@ kubectl get pod -o wide
 kubectl get deployment nginx-deployment -o yaml
 echo -n 'username' | base64
 kubectl get secrets
+minikube service mongo-express-service
+kubectl create namespace my-namespace
+kubectl api-resources --namespaced=false
+kubectl api-resources --namespaced=true
+apt install kubectx
+kubens my-namespace
 ```
