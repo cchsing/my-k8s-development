@@ -32,7 +32,14 @@ helm install opentelemetry-operator open-telemetry/opentelemetry-operator \
 --set "manager.collectorImage.repository=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s" \
 --set admissionWebhooks.certManager.enabled=false \
 --set admissionWebhooks.autoGenerateCert.enabled=true \
+--namespace otel-test-1 \
+--create-namespace
+
+helm install opentelemetry-operator open-telemetry/opentelemetry-operator \
+--set admissionWebhooks.certManager.enabled=false \
+--set admissionWebhooks.autoGenerateCert.enabled=true \
 --namespace otel-test-1
+-f ./opentelemetry/
 
 helm show values open-telemetry/opentelemetry-operator
 helm get values open-telemetry/opentelemetry-operator
@@ -66,4 +73,22 @@ helm install opentelemetry-operator open-telemetry/opentelemetry-operator \
 kubectl exec -it <pod-name> -- bin/bash
 kubectl debug -it <pod-name> -n <namespace> --image=busybox --target=<container-name>
 kubectl rollout restart deployment <deployment_name>
+```
+
+My Setup
+```bash
+helm install opentelemetry-operator open-telemetry/opentelemetry-operator \
+--set "manager.collectorImage.repository=ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib" \
+--set admissionWebhooks.certManager.enabled=false \
+--set admissionWebhooks.autoGenerateCert.enabled=true \
+--namespace opentelemetry \
+--create-namespace
+
+# Export the values.yaml for configuration
+helm show values open-telemetry/opentelemetry-operator > otelopr-values.yaml
+
+kubectl get crd opentelemetrycollectors.opentelemetry.io -o yaml
+kubectl explain opentelemetrycollector.spec
+
+kubectl apply -f ./opentelemetry/
 ```
