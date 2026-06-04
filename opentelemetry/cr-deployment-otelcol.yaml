@@ -8,7 +8,7 @@ metadata:
 spec:
   image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib"
   mode: deployment
-  hostNetwork: true
+  hostNetwork: false
   envFrom:
     - secretRef:
         name: otel-secret
@@ -46,9 +46,19 @@ spec:
         index: "otlp-logs"
         tls:
           insecure_skip_verify: true
+      splunk_hec/traces:
+        token: ${env:SPLUNK_HEC_TOKEN}
+        endpoint: ${env:SPLUNK_HEC_ENDPOINT}
+        index: "otlp-traces"
+        tls:
+          insecure_skip_verify: true
 
     service:
       pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [splunk_hec/traces]
         metrics:
           receivers: [otlp,k8s_cluster]
           processors: [batch]

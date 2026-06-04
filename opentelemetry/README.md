@@ -90,5 +90,20 @@ helm show values open-telemetry/opentelemetry-operator > otelopr-values.yaml
 kubectl get crd opentelemetrycollectors.opentelemetry.io -o yaml
 kubectl explain opentelemetrycollector.spec
 
-kubectl apply -f ./opentelemetry/
+helm install otel-demo open-telemetry/opentelemetry-demo \
+--namespace otel-demo \
+--create-namespace
+
+kubectl --namespace otel-demo port-forward svc/frontend-proxy 8080:8080
+```
+
+```bash
+kubectl get service streamlit-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+kubectl port-forward service/streamlit-service 8080:80 --address 0.0.0.0
+kubectl rollout restart deployment/my-streamlit-app
+```
+
+```
+kubectl exec -it daemonset-otelcol-collector-jmlhq -n opentelemetry -- \
+  curl -s http://172.18.0.2:10255/stats/summary | head -20
 ```
