@@ -7,7 +7,7 @@ metadata:
 spec:
   # Global configuration
   exporter:
-    endpoint: http://deployment-otelcol-collector.observability.svc.cluster.local:4317
+    endpoint: http://deployment-otelcol-collector.opentelemetry.svc.cluster.local:4317
   propagators:
     - tracecontext
     - baggage
@@ -21,7 +21,7 @@ spec:
     env:
       # Python auto-instrumentation uses OTLP/HTTP by default.
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: http://deployment-otelcol-collector.observability.svc.cluster.local:4318
+        value: http://deployment-otelcol-collector.opentelemetry.svc.cluster.local:4318
       - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
         value: "true"
 

@@ -103,7 +103,10 @@ kubectl port-forward service/streamlit-service 8080:80 --address 0.0.0.0
 kubectl rollout restart deployment/my-streamlit-app
 ```
 
-```
+```bash
 kubectl exec -it daemonset-otelcol-collector-jmlhq -n opentelemetry -- \
   curl -s http://172.18.0.2:10255/stats/summary | head -20
+
+kubectl get pod my-streamlit-app-84f8fcf556-gvszs -o jsonpath='{.spec.initContainers[*].name}' -n default
+kubectl exec -it my-client-pod -- curl -v http://deployment-otelcol-collector.opentelemetry.svc.cluster.local:4318
 ```
